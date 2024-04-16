@@ -132,7 +132,7 @@ const UpdateEmployee = () => {
             <Form.Control type="file" name="image" value={formData.image} onChange={handleChange} />
           </Form.Group>
           <Button variant="primary" type="submit" style={{ marginTop: '10px' }}>
-            Submit
+            Update
           </Button>
         </Form>
       </Container>

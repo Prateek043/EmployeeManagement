@@ -6,9 +6,11 @@ import axios from 'axios';
 
 const EmployeeTable = () => {
   const [employees, setEmployees] = useState([]);
+  const [filteredEmployees, setFilteredEmployees] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [profile, setProfile] = useState();
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(5); // Change this to adjust items per page
+  const [itemsPerPage] = useState(5);
   const navigate = useNavigate();
 
   const fetchEmployees = async () => {
@@ -43,10 +45,24 @@ const EmployeeTable = () => {
     }
   };
 
+  const handleSearchChange = (e) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+    filterEmployees(query);
+  };
+
+  const filterEmployees = (query) => {
+    const filtered = employees.filter(employee =>
+      employee.name.toLowerCase().includes(query.toLowerCase()) ||
+      employee.email.toLowerCase().includes(query.toLowerCase())
+    );
+    setFilteredEmployees(filtered);
+  };
+
   // Pagination Logic
   const indexOfLastEmployee = currentPage * itemsPerPage;
   const indexOfFirstEmployee = indexOfLastEmployee - itemsPerPage;
-  const currentEmployees = employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
+  const currentEmployees = searchQuery ? filteredEmployees : employees.slice(indexOfFirstEmployee, indexOfLastEmployee);
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
@@ -56,7 +72,7 @@ const EmployeeTable = () => {
       <NavbarComponent data={profile} />
       <div className="container d-flex justify-content-end mt-3 mb-3 gap-10">
         <p className='text-black' style={{ marginRight: "10px", marginTop: "7px" }}>Total Employee: {employees.length}</p>
-        <input type="search" name="search" id="search" style={{ marginRight: '10px' }} placeholder="Search by name or email" />
+        <input type="search" name="search" id="search" style={{ marginRight: '10px' }} value={searchQuery} onChange={handleSearchChange} placeholder="Search by name or email" />
         <Button variant="primary">Search</Button>
       </div>
       <div className="container d-flex justify-content-center">
@@ -103,7 +119,7 @@ const EmployeeTable = () => {
         </Table>
       </div>
       <div className="container d-flex justify-content-center">
-      <ul className="pagination">
+        <ul className="pagination">
           {Array.from({ length: Math.ceil(employees.length / itemsPerPage) }, (_, i) => (
             <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
               <Button onClick={() => paginate(i + 1)} className="page-link">
